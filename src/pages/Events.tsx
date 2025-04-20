@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import EventCard from "@/components/ui/card-event";
@@ -12,8 +11,8 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlusCircle, Search } from "lucide-react";
 
-// Mock data for events
 const eventsData = [
   {
     id: "1",
@@ -101,7 +100,6 @@ const Events = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [eventView, setEventView] = useState("all");
 
-  // Filter events based on search, category, and view
   const filteredEvents = eventsData.filter((event) => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -117,27 +115,35 @@ const Events = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gtu-gray-800">Campus Events</h1>
-          <p className="text-gtu-gray-600 mt-2">
-            Discover workshops, seminars, competitions, and other events happening at GTU.
-          </p>
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <div className="relative bg-gradient 
+          to-gtu-blue/10 from-gtu-orange/10 rounded-2xl p-8 mb-8">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl font-bold text-gtu-gray-800 mb-4">
+              Campus Events
+            </h1>
+            <p className="text-gtu-gray-600 text-lg">
+              Discover workshops, seminars, competitions, and other exciting events happening at GTU.
+              Join us to learn, connect, and grow together.
+            </p>
+          </div>
         </div>
 
-        {/* Search and Filter Section */}
-        <div className="bg-white shadow-sm rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="col-span-1 md:col-span-3">
-              <Input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+        <div className="bg-white shadow-lg rounded-xl p-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <div className="md:col-span-5">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gtu-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search events..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
-            <div>
+            <div className="md:col-span-3">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Category" />
@@ -151,34 +157,41 @@ const Events = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Tabs value={eventView} onValueChange={setEventView} className="w-full">
-                <TabsList className="w-full">
-                  <TabsTrigger value="all" className="flex-1">All Events</TabsTrigger>
-                  <TabsTrigger value="registered" className="flex-1">Registered</TabsTrigger>
-                  <TabsTrigger value="available" className="flex-1">Available</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-            <div className="md:text-right">
-              <Button>
+            <div className="md:col-span-4 flex justify-end">
+              <Button className="w-full md:w-auto" size="lg">
+                <PlusCircle className="mr-2 h-5 w-5" />
                 Submit Event
               </Button>
             </div>
           </div>
+
+          <div className="mt-6">
+            <Tabs value={eventView} onValueChange={setEventView} className="w-full">
+              <TabsList className="w-full max-w-md mx-auto grid grid-cols-3">
+                <TabsTrigger value="all">All Events</TabsTrigger>
+                <TabsTrigger value="registered">Registered</TabsTrigger>
+                <TabsTrigger value="available">Available</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </div>
 
-        {/* Events Grid */}
         {filteredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} {...event} />
+              <div key={event.id} className="transform transition-all duration-300 hover:scale-105">
+                <EventCard {...event} />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-gtu-gray-700 mb-2">No events found</h3>
-            <p className="text-gtu-gray-500">Try adjusting your search or filters</p>
+          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+            <h3 className="text-xl font-semibold text-gtu-gray-700 mb-2">
+              No events found
+            </h3>
+            <p className="text-gtu-gray-500">
+              Try adjusting your search or filters
+            </p>
           </div>
         )}
       </div>
