@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+      },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -52,6 +56,22 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+        gtu: {
+          blue: '#2563EB',
+          orange: '#F97316',
+          gray: {
+            50: '#F8FAFC',
+            100: '#E2E8F0',
+            200: '#CBD5E1',
+            300: '#94A3B8',
+            400: '#64748B',
+            500: '#475569',
+            600: '#334155',
+            700: '#1E293B',
+            800: '#0F172A',
+            900: '#020617',
+          }
+        },
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
