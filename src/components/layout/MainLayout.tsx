@@ -9,9 +9,9 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 scroll-smooth">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white scroll-smooth">
       <Navbar />
-      <main className="flex-grow transition-all duration-300 animate-fade-in">
+      <main className="flex-grow transition-all duration-500 animate-fade-in">
         {children}
       </main>
       <Footer />

@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import ResourceCard from "@/components/ui/card-resource";
+import { AnimatedGradient } from "@/components/ui/animated-gradient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BookOpen, Search } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -113,24 +114,32 @@ const Resources = () => {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gtu-gray-800">Study Resources</h1>
-          <p className="text-gtu-gray-600 mt-2">
-            Browse and download study materials, notes, video tutorials, and more to ace your exams.
-          </p>
-        </div>
+        <AnimatedGradient className="mb-8 p-8">
+          <div className="flex items-center space-x-4">
+            <BookOpen className="h-8 w-8 text-gtu-blue" />
+            <div>
+              <h1 className="text-3xl font-bold text-gtu-gray-800">Study Resources</h1>
+              <p className="text-gtu-gray-600 mt-2">
+                Browse and download study materials, notes, video tutorials, and more to ace your exams.
+              </p>
+            </div>
+          </div>
+        </AnimatedGradient>
 
         {/* Search and Filter Section */}
-        <div className="bg-white shadow-sm rounded-lg p-6 mb-8">
+        <div className="bg-white shadow-lg rounded-xl p-6 mb-8 transition-all duration-300 hover:shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1 md:col-span-3">
-              <Input
-                type="text"
-                placeholder="Search resources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gtu-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search resources..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
             <div>
               <Select value={selectedSubject} onValueChange={setSelectedSubject}>
@@ -164,18 +173,28 @@ const Resources = () => {
           </div>
         </div>
 
-        {/* Resources Grid */}
+        {/* Resources Grid with Animations */}
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredResources.map((resource) => (
-              <ResourceCard key={resource.id} {...resource} />
+            {filteredResources.map((resource, index) => (
+              <div
+                key={resource.id}
+                className="transform transition-all duration-500"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  opacity: 0,
+                  animation: 'fadeInUp 0.5s ease forwards'
+                }}
+              >
+                <ResourceCard {...resource} />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <AnimatedGradient className="text-center py-16">
             <h3 className="text-xl font-semibold text-gtu-gray-700 mb-2">No resources found</h3>
             <p className="text-gtu-gray-500">Try adjusting your search or filters</p>
-          </div>
+          </AnimatedGradient>
         )}
       </div>
     </MainLayout>
