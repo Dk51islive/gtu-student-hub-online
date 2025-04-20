@@ -1,4 +1,4 @@
-
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Calendar, MessageSquare, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -130,59 +130,95 @@ const features = [
 ];
 
 const Index = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-gtu-blue to-blue-700 text-white">
+      {/* Enhanced Hero Section with Animation */}
+      <section className="bg-gradient-to-r from-gtu-blue to-blue-700 text-white overflow-hidden">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
                 Welcome to GTU Student Hub
               </h1>
-              <p className="text-lg md:text-xl mb-8 text-blue-100">
+              <p className="text-lg md:text-xl mb-8 text-blue-100 leading-relaxed">
                 Your one-stop platform for academic resources, community engagement, 
                 and campus updates. Connect, learn, and excel together!
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" asChild className="bg-white text-gtu-blue hover:bg-blue-50">
+                <Button 
+                  size="lg" 
+                  asChild 
+                  className="bg-white text-gtu-blue hover:bg-blue-50 transform transition hover:scale-105"
+                >
                   <Link to="/resources">Explore Resources</Link>
                 </Button>
-                <Button size="lg" variant="outline" asChild className="border-white text-white hover:bg-white/10">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  asChild 
+                  className="border-white text-white hover:bg-white/10 transform transition hover:scale-105"
+                >
                   <Link to="/signup">Join Community</Link>
                 </Button>
               </div>
             </div>
-            <div className="hidden md:flex justify-center">
+            <div className={`hidden md:block transform transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
               <img
                 src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
                 alt="Students studying together"
-                className="rounded-lg shadow-lg max-w-md w-full"
+                className="rounded-lg shadow-2xl max-w-md w-full hover:shadow-blue-500/20 transition-shadow duration-300 transform hover:scale-[1.02]"
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Enhanced Features Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gtu-gray-800 mb-4">What We Offer</h2>
+          <div className="text-center mb-12 transform transition-all duration-700 hover:scale-[1.01]">
+            <h2 className="text-3xl font-bold text-gtu-gray-800 mb-4">
+              What We Offer
+            </h2>
             <p className="text-lg text-gtu-gray-600 max-w-2xl mx-auto">
               Discover all the tools and resources we provide to help you succeed in your academic journey.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                <div className="mb-4">{feature.icon}</div>
+              <div 
+                key={index} 
+                className={`bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:border-gtu-blue/20 ${
+                  isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <div className="mb-4 transform transition-all duration-300 hover:scale-110">
+                  {feature.icon}
+                </div>
                 <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gtu-gray-600 mb-4">{feature.description}</p>
-                <Link to={feature.link} className="text-gtu-blue hover:underline font-medium inline-flex items-center">
+                <Link 
+                  to={feature.link} 
+                  className="text-gtu-blue hover:text-gtu-blue/80 font-medium inline-flex items-center group"
+                >
                   Explore
-                  <svg className="w-4 h-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  <svg 
+                    className="w-4 h-4 ml-1 transform transition-transform group-hover:translate-x-1" 
+                    viewBox="0 0 20 20" 
+                    fill="currentColor"
+                  >
+                    <path 
+                      fillRule="evenodd" 
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" 
+                      clipRule="evenodd" 
+                    />
                   </svg>
                 </Link>
               </div>
@@ -191,18 +227,30 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Recent Resources Section */}
+      {/* Enhanced Recent Resources Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold text-gtu-gray-800">Recent Study Resources</h2>
-            <Link to="/resources" className="text-gtu-blue hover:underline font-medium">
+            <h2 className="text-2xl font-bold text-gtu-gray-800 hover:text-gtu-blue transition-colors">
+              Recent Study Resources
+            </h2>
+            <Link 
+              to="/resources" 
+              className="text-gtu-blue hover:text-gtu-blue/80 font-medium group flex items-center"
+            >
               View All Resources
+              <span className="ml-1 transform transition-transform group-hover:translate-x-1">→</span>
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recentResources.map((resource) => (
-              <ResourceCard key={resource.id} {...resource} />
+            {recentResources.map((resource, index) => (
+              <div
+                key={resource.id}
+                className="transform transition-all duration-500 hover:scale-[1.02]"
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <ResourceCard {...resource} />
+              </div>
             ))}
           </div>
         </div>
@@ -247,14 +295,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16 bg-gtu-blue text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Join the GTU Student Community</h2>
+      {/* Enhanced Call to Action */}
+      <section className="py-16 bg-gtu-blue text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 to-blue-800/50"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl font-bold mb-4 transform transition-all duration-700 hover:scale-105">
+            Join the GTU Student Community
+          </h2>
           <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
             Connect with fellow students, access exclusive resources, and stay updated with campus happenings.
           </p>
-          <Button size="lg" asChild className="bg-white text-gtu-blue hover:bg-blue-50">
+          <Button 
+            size="lg" 
+            asChild 
+            className="bg-white text-gtu-blue hover:bg-blue-50 transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+          >
             <Link to="/signup">Create an Account</Link>
           </Button>
         </div>
