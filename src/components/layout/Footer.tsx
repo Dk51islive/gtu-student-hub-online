@@ -114,7 +114,7 @@ const Footer = () => {
         </div>
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-center text-sm text-gtu-gray-400">
-            &copy; {new Date().getFullYear()} GTUHub. All rights reserved.
+            &copy; {new Date().getFullYear()} GTUinsta. All rights reserved.
           </p>
         </div>
       </div>
@@ -123,3 +123,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
