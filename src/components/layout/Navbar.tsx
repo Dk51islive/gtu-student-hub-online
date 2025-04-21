@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,7 +32,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <span className="text-gtu-blue font-bold text-xl">GTU</span>
-              <span className="text-gtu-orange font-bold text-xl">Hub</span>
+              <span className="text-gtu-orange font-bold text-xl">insta</span>
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-6">
               <Link to="/" className="px-3 py-2 text-gtu-gray-600 hover:text-gtu-blue font-medium">
