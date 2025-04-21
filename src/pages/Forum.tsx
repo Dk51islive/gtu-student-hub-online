@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import ForumPostCard from "@/components/ui/card-forum-post";
@@ -12,8 +11,8 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 
-// Mock data for forum posts
 const forumPostsData = [
   {
     id: "1",
@@ -131,7 +130,6 @@ const Forum = () => {
   const [postFilter, setPostFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
 
-  // Filter posts based on search, category, and filter
   const filteredPosts = forumPostsData.filter((post) => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                         post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -146,11 +144,9 @@ const Forum = () => {
     return matchesSearch && matchesCategory && matchesFilter;
   });
 
-  // Sort posts based on sortBy
   const sortedPosts = [...filteredPosts].sort((a, b) => {
     if (sortBy === "recent") {
-      // Simple sort by createdAt (this is a mock, in real app would use timestamps)
-      return 0; // No sorting in mock data
+      return 0;
     } else if (sortBy === "popular") {
       return b.likes - a.likes;
     } else if (sortBy === "replied") {
@@ -169,7 +165,6 @@ const Forum = () => {
           </p>
         </div>
 
-        {/* Search and Filter Section */}
         <div className="bg-white shadow-sm rounded-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1 md:col-span-3">
@@ -221,14 +216,13 @@ const Forum = () => {
               </div>
             </div>
             <div className="md:text-right">
-              <Button>
-                Start New Discussion
+              <Button asChild>
+                <Link to="/forum/new">Start New Discussion</Link>
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Forum Posts List */}
         {sortedPosts.length > 0 ? (
           <div className="space-y-4">
             {sortedPosts.map((post) => (
@@ -239,8 +233,8 @@ const Forum = () => {
           <div className="text-center py-16">
             <h3 className="text-xl font-semibold text-gtu-gray-700 mb-2">No discussions found</h3>
             <p className="text-gtu-gray-500">Try adjusting your search or filters</p>
-            <Button className="mt-4">
-              Start a New Discussion
+            <Button asChild className="mt-4">
+              <Link to="/forum/new">Start a New Discussion</Link>
             </Button>
           </div>
         )}
