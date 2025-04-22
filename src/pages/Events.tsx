@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlusCircle, Search } from "lucide-react";
+import EventSubmissionForm from "@/components/forms/EventSubmissionForm";
+import { useToast } from "@/hooks/use-toast";
 
 const eventsData = [
   {
@@ -96,9 +98,11 @@ const categoryOptions = [
 ];
 
 const Events = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [eventView, setEventView] = useState("all");
+  const [isSubmitFormOpen, setIsSubmitFormOpen] = useState(false);
 
   const filteredEvents = eventsData.filter((event) => {
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -112,6 +116,21 @@ const Events = () => {
     
     return matchesSearch && matchesCategory && matchesView;
   });
+
+  const handleSubmitEvent = () => {
+    const isLoggedIn = localStorage.getItem("user") !== null;
+    
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "You need to be logged in to submit events.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmitFormOpen(true);
+  };
 
   return (
     <MainLayout>
@@ -158,7 +177,7 @@ const Events = () => {
               </Select>
             </div>
             <div className="md:col-span-4 flex justify-end">
-              <Button className="w-full md:w-auto" size="lg">
+              <Button className="w-full md:w-auto" size="lg" onClick={handleSubmitEvent}>
                 <PlusCircle className="mr-2 h-5 w-5" />
                 Submit Event
               </Button>
@@ -194,6 +213,11 @@ const Events = () => {
             </p>
           </div>
         )}
+
+        <EventSubmissionForm 
+          isOpen={isSubmitFormOpen}
+          onClose={() => setIsSubmitFormOpen(false)}
+        />
       </div>
     </MainLayout>
   );

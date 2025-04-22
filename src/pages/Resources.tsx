@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import ResourceCard from "@/components/ui/card-resource";
@@ -14,9 +13,9 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import ResourceSubmissionForm from "@/components/forms/ResourceSubmissionForm";
 
-// Mock data for resources
 const resourcesData = [
   {
     id: "1",
@@ -28,7 +27,7 @@ const resourcesData = [
     uploadDate: "3 days ago",
     likes: 45,
     downloads: 120,
-    downloadUrl: "/placeholder.svg", // Using placeholder for demo
+    downloadUrl: "/placeholder.svg",
   },
   {
     id: "2",
@@ -40,7 +39,7 @@ const resourcesData = [
     uploadDate: "1 week ago",
     likes: 78,
     downloads: 200,
-    downloadUrl: "/placeholder.svg", // Using placeholder for demo
+    downloadUrl: "/placeholder.svg",
   },
   {
     id: "3",
@@ -52,7 +51,7 @@ const resourcesData = [
     uploadDate: "2 weeks ago",
     likes: 120,
     downloads: 320,
-    downloadUrl: "/placeholder.svg", // Using placeholder for demo
+    downloadUrl: "/placeholder.svg",
   },
   {
     id: "4",
@@ -64,7 +63,7 @@ const resourcesData = [
     uploadDate: "1 month ago",
     likes: 95,
     downloads: 250,
-    downloadUrl: "/placeholder.svg", // Using placeholder for demo
+    downloadUrl: "/placeholder.svg",
   },
   {
     id: "5",
@@ -76,7 +75,7 @@ const resourcesData = [
     uploadDate: "2 months ago",
     likes: 150,
     downloads: 400,
-    downloadUrl: "/placeholder.svg", // Using placeholder for demo
+    downloadUrl: "/placeholder.svg",
   },
   {
     id: "6",
@@ -88,7 +87,7 @@ const resourcesData = [
     uploadDate: "3 months ago",
     likes: 85,
     downloads: 180,
-    downloadUrl: "/placeholder.svg", // Using placeholder for demo
+    downloadUrl: "/placeholder.svg",
   },
 ];
 
@@ -107,8 +106,8 @@ const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All Subjects");
   const [selectedType, setSelectedType] = useState("all");
+  const [isSubmitFormOpen, setIsSubmitFormOpen] = useState(false);
 
-  // Filter resources based on search, subject, and type
   const filteredResources = resourcesData.filter((resource) => {
     const matchesSearch = resource.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                         resource.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -119,9 +118,8 @@ const Resources = () => {
     
     return matchesSearch && matchesSubject && matchesType;
   });
-  
+
   const handleUpload = () => {
-    // Check if user is logged in
     const isLoggedIn = localStorage.getItem("user") !== null;
     
     if (!isLoggedIn) {
@@ -133,11 +131,7 @@ const Resources = () => {
       return;
     }
     
-    // Here we would normally navigate to an upload form
-    toast({
-      title: "Upload Feature",
-      description: "Resource upload form would open here.",
-    });
+    setIsSubmitFormOpen(true);
   };
 
   return (
@@ -155,8 +149,7 @@ const Resources = () => {
           </div>
         </AnimatedGradient>
 
-        {/* Search and Filter Section */}
-        <div className="bg-white shadow-lg rounded-xl p-6 mb-8 transition-all duration-300 hover:shadow-xl">
+        <div className="bg-white shadow-lg rounded-xl p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="col-span-1 md:col-span-3">
               <div className="relative">
@@ -202,7 +195,6 @@ const Resources = () => {
           </div>
         </div>
 
-        {/* Watermark Information Alert */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
           <h3 className="text-sm font-medium text-blue-800 mb-1">Copyright Protection</h3>
           <p className="text-sm text-blue-700">
@@ -211,7 +203,6 @@ const Resources = () => {
           </p>
         </div>
 
-        {/* Resources Grid with Animations */}
         {filteredResources.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResources.map((resource, index) => (
@@ -234,6 +225,11 @@ const Resources = () => {
             <p className="text-gtu-gray-500">Try adjusting your search or filters</p>
           </AnimatedGradient>
         )}
+
+        <ResourceSubmissionForm 
+          isOpen={isSubmitFormOpen}
+          onClose={() => setIsSubmitFormOpen(false)}
+        />
       </div>
     </MainLayout>
   );
