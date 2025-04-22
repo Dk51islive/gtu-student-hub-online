@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,13 @@ import ForumNew from "./pages/ForumNew";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import FAQ from "./pages/support/FAQ";
+import ContactUs from "./pages/support/ContactUs";
+import HelpCenter from "./pages/support/HelpCenter";
+import Feedback from "./pages/support/Feedback";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import TermsOfService from "./pages/legal/TermsOfService";
+import CookiePolicy from "./pages/legal/CookiePolicy";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +55,18 @@ const App = () => {
               <Route path="/forum/new" element={<ForumNew />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              
+              {/* Support Pages */}
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/help" element={<HelpCenter />} />
+              <Route path="/feedback" element={<Feedback />} />
+              
+              {/* Legal Pages */}
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/cookies" element={<CookiePolicy />} />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

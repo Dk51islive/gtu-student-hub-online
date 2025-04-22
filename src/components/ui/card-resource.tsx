@@ -4,6 +4,8 @@ import { BookOpen, FileText, Video } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { downloadWithWatermark } from "@/utils/watermarkPdf";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface ResourceCardProps {
   id: string;
@@ -16,6 +18,7 @@ export interface ResourceCardProps {
   likes?: number;
   downloads?: number;
   thumbnailUrl?: string;
+  downloadUrl?: string;
 }
 
 const ResourceCard = ({
@@ -29,7 +32,9 @@ const ResourceCard = ({
   likes = 0,
   downloads = 0,
   thumbnailUrl,
+  downloadUrl,
 }: ResourceCardProps) => {
+  const { toast } = useToast();
   
   const getIcon = () => {
     switch (type) {
@@ -54,6 +59,33 @@ const ResourceCard = ({
       default:
         return 'Resource';
     }
+  };
+  
+  const handleDownload = async () => {
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem("user") !== null;
+    
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "You need to be logged in to download resources.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Mock user data - in a real application this would come from authentication
+    const userData = {
+      enrollmentNo: "GTU12345",
+      phoneNumber: "9876543210",
+      name: "Student Name"
+    };
+    
+    // Use the downloadUrl if provided, otherwise construct one based on id
+    const url = downloadUrl || `/api/resources/${id}/download`;
+    const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${type === 'pdf' ? 'pdf' : type === 'video' ? 'mp4' : 'txt'}`;
+    
+    await downloadWithWatermark(url, fileName, userData);
   };
 
   return (
@@ -112,9 +144,14 @@ const ResourceCard = ({
             {downloads}
           </span>
         </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link to={`/resources/${id}`}>View</Link>
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to={`/resources/${id}`}>View</Link>
+          </Button>
+          <Button size="sm" onClick={handleDownload}>
+            Download
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

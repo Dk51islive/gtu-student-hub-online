@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import ResourceCard from "@/components/ui/card-resource";
@@ -13,6 +14,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
 
 // Mock data for resources
 const resourcesData = [
@@ -26,6 +28,7 @@ const resourcesData = [
     uploadDate: "3 days ago",
     likes: 45,
     downloads: 120,
+    downloadUrl: "/placeholder.svg", // Using placeholder for demo
   },
   {
     id: "2",
@@ -37,6 +40,7 @@ const resourcesData = [
     uploadDate: "1 week ago",
     likes: 78,
     downloads: 200,
+    downloadUrl: "/placeholder.svg", // Using placeholder for demo
   },
   {
     id: "3",
@@ -48,6 +52,7 @@ const resourcesData = [
     uploadDate: "2 weeks ago",
     likes: 120,
     downloads: 320,
+    downloadUrl: "/placeholder.svg", // Using placeholder for demo
   },
   {
     id: "4",
@@ -59,6 +64,7 @@ const resourcesData = [
     uploadDate: "1 month ago",
     likes: 95,
     downloads: 250,
+    downloadUrl: "/placeholder.svg", // Using placeholder for demo
   },
   {
     id: "5",
@@ -70,6 +76,7 @@ const resourcesData = [
     uploadDate: "2 months ago",
     likes: 150,
     downloads: 400,
+    downloadUrl: "/placeholder.svg", // Using placeholder for demo
   },
   {
     id: "6",
@@ -81,6 +88,7 @@ const resourcesData = [
     uploadDate: "3 months ago",
     likes: 85,
     downloads: 180,
+    downloadUrl: "/placeholder.svg", // Using placeholder for demo
   },
 ];
 
@@ -95,6 +103,7 @@ const subjectOptions = [
 ];
 
 const Resources = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All Subjects");
   const [selectedType, setSelectedType] = useState("all");
@@ -110,6 +119,26 @@ const Resources = () => {
     
     return matchesSearch && matchesSubject && matchesType;
   });
+  
+  const handleUpload = () => {
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem("user") !== null;
+    
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "You need to be logged in to upload resources.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Here we would normally navigate to an upload form
+    toast({
+      title: "Upload Feature",
+      description: "Resource upload form would open here.",
+    });
+  };
 
   return (
     <MainLayout>
@@ -166,11 +195,20 @@ const Resources = () => {
               </Tabs>
             </div>
             <div className="md:text-right">
-              <Button>
+              <Button onClick={handleUpload}>
                 Upload Resource
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Watermark Information Alert */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+          <h3 className="text-sm font-medium text-blue-800 mb-1">Copyright Protection</h3>
+          <p className="text-sm text-blue-700">
+            All downloaded resources are watermarked with your enrollment number and phone number for copyright protection. 
+            Do not share the downloaded materials to protect your personal information.
+          </p>
         </div>
 
         {/* Resources Grid with Animations */}
