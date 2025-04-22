@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { BookOpen, FileText, Video } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";

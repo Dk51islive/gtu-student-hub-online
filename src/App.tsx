@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,10 @@ import Feedback from "./pages/support/Feedback";
 import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
 import TermsOfService from "./pages/legal/TermsOfService";
 import CookiePolicy from "./pages/legal/CookiePolicy";
+import ViewResource from "./pages/ViewResource";
+import RegisterEvent from "./pages/RegisterEvent";
+import JoinGroup from "./pages/JoinGroup";
+import CreateGroup from "./pages/CreateGroup";
 
 const queryClient = new QueryClient();
 
@@ -47,10 +50,15 @@ const App = () => {
           <BrowserRouter>
             <ScrollToTop />
             <Routes>
+              {/* Main content routes */}
               <Route path="/" element={<Index />} />
               <Route path="/resources" element={<Resources />} />
+              <Route path="/resources/:id" element={<ViewResource />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/events/:id/register" element={<RegisterEvent />} />
               <Route path="/community" element={<Community />} />
+              <Route path="/community/groups/:id/join" element={<JoinGroup />} />
+              <Route path="/community/groups/new" element={<CreateGroup />} />
               <Route path="/forum" element={<Forum />} />
               <Route path="/forum/new" element={<ForumNew />} />
               <Route path="/login" element={<Login />} />

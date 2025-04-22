@@ -33,7 +33,7 @@ const EventCard = ({
   isRegistered = false,
 }: EventCardProps) => {
   const isFullyBooked = maxAttendees !== undefined && attendees >= maxAttendees;
-  
+
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
       <CardHeader className="p-0">

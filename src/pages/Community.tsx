@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Book, Calendar, Medal, Laptop, Coffee } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Mock data for student groups
 const studentGroupsData = [
@@ -224,8 +224,8 @@ const Community = () => {
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button variant="outline" className="w-full">
-          Join Group
+        <Button variant="outline" className="w-full" asChild>
+          <Link to={`/community/groups/${group.id}/join`}>Join Group</Link>
         </Button>
       </CardFooter>
     </Card>
@@ -298,7 +298,6 @@ const Community = () => {
           </p>
         </div>
 
-        {/* Tabs for different sections */}
         <Tabs 
           value={activeTab} 
           onValueChange={setActiveTab}
@@ -316,7 +315,6 @@ const Community = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Search and Filter Section */}
           <div className="bg-white shadow-sm rounded-lg p-6 my-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -340,16 +338,17 @@ const Community = () => {
                 </select>
               )}
               <div className="md:col-span-2 md:text-right mt-4 md:mt-0">
-                <Button>
-                  {activeTab === "groups" ? "Create New Group" : 
-                   activeTab === "study" ? "Start Study Group" : 
-                   "Apply for Ambassador Program"}
+                <Button asChild>
+                  <Link to="/community/groups/new">
+                    {activeTab === "groups" ? "Create New Group" : 
+                    activeTab === "study" ? "Start Study Group" : 
+                    "Apply for Ambassador Program"}
+                  </Link>
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Content for Student Groups tab */}
           <TabsContent value="groups" className="border-none p-0">
             {filteredGroups.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -360,14 +359,15 @@ const Community = () => {
                 <Users className="h-16 w-16 text-gtu-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gtu-gray-700 mb-2">No student groups found</h3>
                 <p className="text-gtu-gray-500">Try adjusting your search or create a new group</p>
-                <Button className="mt-4">
-                  Create New Group
+                <Button asChild className="mt-4">
+                  <Link to="/community/groups/new">
+                    Create New Group
+                  </Link>
                 </Button>
               </div>
             )}
           </TabsContent>
 
-          {/* Content for Student Ambassadors tab */}
           <TabsContent value="ambassadors" className="border-none p-0">
             {filteredAmbassadors.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -382,7 +382,6 @@ const Community = () => {
             )}
           </TabsContent>
 
-          {/* Content for Study Groups tab */}
           <TabsContent value="study" className="border-none p-0">
             {filteredStudyGroups.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -393,15 +392,16 @@ const Community = () => {
                 <Book className="h-16 w-16 text-gtu-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gtu-gray-700 mb-2">No study groups found</h3>
                 <p className="text-gtu-gray-500">Try adjusting your search or start a new study group</p>
-                <Button className="mt-4">
-                  Start Study Group
+                <Button asChild className="mt-4">
+                  <Link to="/community/groups/new">
+                    Start Study Group
+                  </Link>
                 </Button>
               </div>
             )}
           </TabsContent>
         </Tabs>
 
-        {/* Community Features */}
         <section className="mt-12 bg-white rounded-lg shadow-sm p-8">
           <h2 className="text-2xl font-bold text-gtu-gray-800 mb-6">Get Involved in Campus Life</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
