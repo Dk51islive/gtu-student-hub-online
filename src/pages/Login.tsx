@@ -29,6 +29,23 @@ const Login = () => {
     checkSession();
   }, [navigate]);
 
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          toast({
+            title: "Welcome back!",
+            description: "You have been successfully logged in.",
+          });
+          navigate("/");
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
   const validateForm = () => {
     const errors: {[key: string]: string} = {};
     
@@ -57,37 +74,38 @@ const Login = () => {
 
       if (error) {
         console.error("Login error:", error);
-        throw error;
+        
+        // Provide more specific error messages based on common authentication issues
+        let errorMessage = "Invalid email or password. Please try again.";
+        
+        if (error.message) {
+          if (error.message.includes("Invalid login credentials")) {
+            errorMessage = "Invalid email or password. Please try again.";
+          } else if (error.message.includes("Email not confirmed")) {
+            errorMessage = "Please confirm your email before logging in.";
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        
+        toast({
+          title: "Login failed",
+          description: errorMessage,
+          variant: "destructive"
+        });
+        
+        return;
       }
 
+      // Note: We don't need to navigate here as the onAuthStateChange handles this
       console.log("Login successful:", data);
-
-      toast({
-        title: "Welcome back!",
-        description: "You have been successfully logged in.",
-      });
       
-      // Redirect to home page after successful login
-      navigate("/");
     } catch (error: any) {
       console.error("Error during login:", error);
       
-      // Provide more specific error messages based on common authentication issues
-      let errorMessage = "Invalid email or password. Please try again.";
-      
-      if (error.message) {
-        if (error.message.includes("Invalid login credentials")) {
-          errorMessage = "Invalid email or password. Please try again.";
-        } else if (error.message.includes("Email not confirmed")) {
-          errorMessage = "Please confirm your email before logging in.";
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      
       toast({
         title: "Login failed",
-        description: errorMessage,
+        description: "An unexpected error occurred. Please try again later.",
         variant: "destructive"
       });
     } finally {
@@ -134,6 +152,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={formErrors.email ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
               </div>
@@ -154,6 +173,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={formErrors.password ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
               </div>
@@ -162,12 +182,17 @@ const Login = () => {
                   id="remember-me"
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(!!checked)}
+                  disabled={isLoading}
                 />
                 <Label htmlFor="remember-me" className="text-sm">
                   Remember me
                 </Label>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>

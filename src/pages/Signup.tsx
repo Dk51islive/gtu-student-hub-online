@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -27,7 +29,20 @@ const Signup = () => {
   const [yearOfStudy, setYearOfStudy] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/");
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
 
   const departmentOptions = [
     "Computer Engineering",
@@ -85,7 +100,8 @@ const Signup = () => {
             department,
             enrollment_number: enrollmentNumber,
             year_of_study: yearOfStudy,
-          }
+          },
+          emailRedirectTo: window.location.origin + "/login"
         }
       });
 
@@ -96,13 +112,13 @@ const Signup = () => {
 
       console.log("Signup successful:", data);
       
+      // Show success message instead of redirecting
+      setIsSuccess(true);
       toast({
         title: "Account created successfully",
-        description: "You can now log in with your credentials",
+        description: "Please check your email to verify your account",
       });
       
-      // Redirect to login page after successful signup
-      navigate("/login");
     } catch (error: any) {
       console.error("Error during signup:", error);
       
@@ -126,6 +142,83 @@ const Signup = () => {
       setIsLoading(false);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <Link to="/" className="flex items-center justify-center">
+              <span className="text-gtu-blue font-bold text-3xl">GTU</span>
+              <span className="text-gtu-orange font-bold text-3xl">Hub</span>
+            </Link>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+              Check your email
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              We've sent a verification link to {email}
+            </p>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Please check your email and click the verification link to complete your signup.
+                  After verifying your email, you will be able to log in.
+                </AlertDescription>
+              </Alert>
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-500">
+                  Didn't receive an email? Check your spam folder or
+                </p>
+                <Button 
+                  variant="link" 
+                  onClick={() => {
+                    setIsLoading(true);
+                    supabase.auth.resend({
+                      type: 'signup',
+                      email: email,
+                      options: {
+                        emailRedirectTo: window.location.origin + "/login"
+                      }
+                    })
+                    .then(() => {
+                      toast({
+                        title: "Verification email resent",
+                        description: "Please check your inbox",
+                      });
+                    })
+                    .catch((error) => {
+                      toast({
+                        title: "Failed to resend email",
+                        description: error.message,
+                        variant: "destructive"
+                      });
+                    })
+                    .finally(() => {
+                      setIsLoading(false);
+                    });
+                  }}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Sending..." : "Resend verification email"}
+                </Button>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-center border-t pt-6">
+              <Link
+                to="/login"
+                className="text-sm font-medium text-gtu-blue hover:text-gtu-blue/80"
+              >
+                Back to login
+              </Link>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -166,6 +259,7 @@ const Signup = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className={formErrors.name ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {formErrors.name && <p className="text-sm text-red-500">{formErrors.name}</p>}
               </div>
@@ -178,6 +272,7 @@ const Signup = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={formErrors.email ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
               </div>
@@ -191,6 +286,7 @@ const Signup = () => {
                     value={enrollmentNumber}
                     onChange={(e) => setEnrollmentNumber(e.target.value)}
                     className={formErrors.enrollmentNumber ? "border-red-500" : ""}
+                    disabled={isLoading}
                   />
                   {formErrors.enrollmentNumber && <p className="text-sm text-red-500">{formErrors.enrollmentNumber}</p>}
                 </div>
@@ -199,6 +295,7 @@ const Signup = () => {
                   <Select 
                     value={yearOfStudy} 
                     onValueChange={setYearOfStudy}
+                    disabled={isLoading}
                   >
                     <SelectTrigger 
                       id="year"
@@ -222,6 +319,7 @@ const Signup = () => {
                 <Select 
                   value={department} 
                   onValueChange={setDepartment}
+                  disabled={isLoading}
                 >
                   <SelectTrigger 
                     id="department"
@@ -250,6 +348,7 @@ const Signup = () => {
                   required
                   minLength={6}
                   className={formErrors.password ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
               </div>
@@ -264,6 +363,7 @@ const Signup = () => {
                   required
                   minLength={6}
                   className={formErrors.confirmPassword ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 {formErrors.confirmPassword && <p className="text-sm text-red-500">{formErrors.confirmPassword}</p>}
               </div>
@@ -273,6 +373,7 @@ const Signup = () => {
                   checked={termsAccepted}
                   onCheckedChange={(checked) => setTermsAccepted(!!checked)}
                   className={formErrors.terms ? "border-red-500" : ""}
+                  disabled={isLoading}
                 />
                 <Label htmlFor="terms" className={`text-sm ${formErrors.terms ? "text-red-500" : ""}`}>
                   I agree to the{" "}
