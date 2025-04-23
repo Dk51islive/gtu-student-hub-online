@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
@@ -14,7 +13,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { CornerUpLeft, UsersPlus } from "lucide-react";
+import { CornerUpLeft, UserPlus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CreateGroup = () => {
@@ -72,7 +71,7 @@ const CreateGroup = () => {
         <Card className="bg-white rounded-xl shadow-md max-w-3xl mx-auto">
           <div className="p-6 md:p-8">
             <div className="flex items-center mb-6">
-              <UsersPlus className="h-6 w-6 text-gtu-blue mr-2" />
+              <UserPlus className="h-6 w-6 text-gtu-blue mr-2" />
               <h1 className="text-2xl md:text-3xl font-bold">Create New Student Group</h1>
             </div>
             
