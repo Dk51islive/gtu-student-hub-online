@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,11 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +26,7 @@ const Signup = () => {
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [yearOfStudy, setYearOfStudy] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const departmentOptions = [
     "Computer Engineering",
@@ -37,18 +41,65 @@ const Signup = () => {
 
   const yearOptions = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, you would handle registration here
-    console.log("Registration attempted with:", {
-      name,
-      email,
-      password,
-      department,
-      enrollmentNumber,
-      yearOfStudy,
-      termsAccepted,
-    });
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: "Passwords do not match",
+        description: "Please make sure your passwords match",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!termsAccepted) {
+      toast({
+        title: "Terms not accepted",
+        description: "Please accept the terms of service to continue",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      // Register user with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+            department,
+            enrollment_number: enrollmentNumber,
+            year_of_study: yearOfStudy,
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account",
+      });
+      
+      // Redirect to login page after successful signup
+      navigate("/login");
+    } catch (error: any) {
+      console.error("Error during signup:", error);
+      toast({
+        title: "Signup failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -155,6 +206,7 @@ const Signup = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={6}
                 />
               </div>
               <div className="space-y-2">
@@ -166,6 +218,7 @@ const Signup = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  minLength={6}
                 />
               </div>
               <div className="flex items-center space-x-2">
@@ -192,8 +245,12 @@ const Signup = () => {
                   </Link>
                 </Label>
               </div>
-              <Button type="submit" className="w-full" disabled={!termsAccepted}>
-                Create Account
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={!termsAccepted || isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           </CardContent>
