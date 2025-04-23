@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,6 +11,7 @@ import Events from "./pages/Events";
 import Community from "./pages/Community";
 import Forum from "./pages/Forum";
 import ForumNew from "./pages/ForumNew";
+import ForumPostView from "./pages/ForumPostView";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -61,6 +63,7 @@ const App = () => {
               <Route path="/community/groups/new" element={<CreateGroup />} />
               <Route path="/forum" element={<Forum />} />
               <Route path="/forum/new" element={<ForumNew />} />
+              <Route path="/forum/post/:id" element={<ForumPostView />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               

@@ -45,8 +45,8 @@ const ForumPostCard = ({
             </Avatar>
           </Link>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="outline">{category}</Badge>
                 {solved && (
                   <Badge className="bg-green-500 hover:bg-green-600">Solved</Badge>
@@ -83,7 +83,7 @@ const ForumPostCard = ({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="border-t bg-muted/10 p-3 flex justify-between">
+      <CardFooter className="border-t bg-muted/10 p-3 flex justify-between flex-wrap gap-2">
         <div className="flex space-x-4">
           <div className="flex items-center text-sm text-gtu-gray-500">
             <ThumbsUp className="mr-1 h-4 w-4" />

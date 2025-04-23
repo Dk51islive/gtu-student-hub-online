@@ -74,6 +74,23 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Improve responsive typography */
+  h1 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold;
+  }
+  
+  h2 {
+    @apply text-xl md:text-2xl lg:text-3xl font-bold;
+  }
+  
+  h3 {
+    @apply text-lg md:text-xl font-bold;
+  }
+  
+  p {
+    @apply text-base leading-relaxed;
+  }
 }
 
 @keyframes fadeInUp {
@@ -116,4 +133,46 @@
 /* Card hover effects */
 .card-hover {
   @apply transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl;
+}
+
+/* Improved responsive grid for card layouts */
+.responsive-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Mobile friendlier spacing */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .card {
+    @apply p-4;
+  }
+  
+  .section-spacing {
+    @apply py-8;
+  }
+}
+
+/* Better focus states for accessibility */
+:focus-visible {
+  @apply outline-none ring-2 ring-gtu-blue ring-offset-2;
+}
+
+/* Make form elements mobile-friendly */
+input, select, textarea {
+  @apply text-base w-full p-2;
+}
+
+button {
+  @apply text-base;
+}
+
+/* Improve button touchable area on mobile */
+@media (max-width: 640px) {
+  button, .btn, a.btn {
+    @apply py-2.5 px-5;
+    min-height: 44px;
+  }
 }
