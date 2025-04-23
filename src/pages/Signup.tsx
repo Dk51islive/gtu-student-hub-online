@@ -27,6 +27,7 @@ const Signup = () => {
   const [yearOfStudy, setYearOfStudy] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const departmentOptions = [
     "Computer Engineering",
@@ -41,22 +42,31 @@ const Signup = () => {
 
   const yearOptions = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
 
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    
+    if (!name.trim()) errors.name = "Name is required";
+    if (!email.trim()) errors.email = "Email is required";
+    if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = "Please enter a valid email";
+    if (!password) errors.password = "Password is required";
+    if (password.length < 6) errors.password = "Password must be at least 6 characters";
+    if (password !== confirmPassword) errors.confirmPassword = "Passwords do not match";
+    if (!department) errors.department = "Please select a department";
+    if (!enrollmentNumber.trim()) errors.enrollmentNumber = "Enrollment number is required";
+    if (!yearOfStudy) errors.yearOfStudy = "Please select your year of study";
+    if (!termsAccepted) errors.terms = "You must accept the terms of service";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
+    if (!validateForm()) {
       toast({
-        title: "Passwords do not match",
-        description: "Please make sure your passwords match",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!termsAccepted) {
-      toast({
-        title: "Terms not accepted",
-        description: "Please accept the terms of service to continue",
+        title: "Form validation failed",
+        description: "Please check the form for errors",
         variant: "destructive"
       });
       return;
@@ -80,21 +90,36 @@ const Signup = () => {
       });
 
       if (error) {
+        console.error("Signup error:", error);
         throw error;
       }
 
+      console.log("Signup successful:", data);
+      
       toast({
-        title: "Account created",
-        description: "Please check your email to verify your account",
+        title: "Account created successfully",
+        description: "You can now log in with your credentials",
       });
       
       // Redirect to login page after successful signup
       navigate("/login");
     } catch (error: any) {
       console.error("Error during signup:", error);
+      
+      // Provide more specific error messages based on Supabase error codes
+      let errorMessage = "Something went wrong. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes("User already registered")) {
+          errorMessage = "This email is already registered. Please use another email or try to login.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Signup failed",
-        description: error.message || "Something went wrong. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -140,8 +165,9 @@ const Signup = () => {
                   placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  required
+                  className={formErrors.name ? "border-red-500" : ""}
                 />
+                {formErrors.name && <p className="text-sm text-red-500">{formErrors.name}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -151,8 +177,9 @@ const Signup = () => {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  className={formErrors.email ? "border-red-500" : ""}
                 />
+                {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -163,13 +190,20 @@ const Signup = () => {
                     placeholder="Enter enrollment no."
                     value={enrollmentNumber}
                     onChange={(e) => setEnrollmentNumber(e.target.value)}
-                    required
+                    className={formErrors.enrollmentNumber ? "border-red-500" : ""}
                   />
+                  {formErrors.enrollmentNumber && <p className="text-sm text-red-500">{formErrors.enrollmentNumber}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="year">Year of Study</Label>
-                  <Select value={yearOfStudy} onValueChange={setYearOfStudy}>
-                    <SelectTrigger id="year">
+                  <Select 
+                    value={yearOfStudy} 
+                    onValueChange={setYearOfStudy}
+                  >
+                    <SelectTrigger 
+                      id="year"
+                      className={formErrors.yearOfStudy ? "border-red-500" : ""}
+                    >
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                     <SelectContent>
@@ -180,12 +214,19 @@ const Signup = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                  {formErrors.yearOfStudy && <p className="text-sm text-red-500">{formErrors.yearOfStudy}</p>}
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
-                <Select value={department} onValueChange={setDepartment}>
-                  <SelectTrigger id="department">
+                <Select 
+                  value={department} 
+                  onValueChange={setDepartment}
+                >
+                  <SelectTrigger 
+                    id="department"
+                    className={formErrors.department ? "border-red-500" : ""}
+                  >
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent>
@@ -196,6 +237,7 @@ const Signup = () => {
                     ))}
                   </SelectContent>
                 </Select>
+                {formErrors.department && <p className="text-sm text-red-500">{formErrors.department}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
@@ -207,7 +249,9 @@ const Signup = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
+                  className={formErrors.password ? "border-red-500" : ""}
                 />
+                {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
@@ -219,16 +263,18 @@ const Signup = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
+                  className={formErrors.confirmPassword ? "border-red-500" : ""}
                 />
+                {formErrors.confirmPassword && <p className="text-sm text-red-500">{formErrors.confirmPassword}</p>}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="terms"
                   checked={termsAccepted}
                   onCheckedChange={(checked) => setTermsAccepted(!!checked)}
-                  required
+                  className={formErrors.terms ? "border-red-500" : ""}
                 />
-                <Label htmlFor="terms" className="text-sm">
+                <Label htmlFor="terms" className={`text-sm ${formErrors.terms ? "text-red-500" : ""}`}>
                   I agree to the{" "}
                   <Link
                     to="/terms"
@@ -248,7 +294,7 @@ const Signup = () => {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={!termsAccepted || isLoading}
+                disabled={isLoading}
               >
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>

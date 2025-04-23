@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +15,38 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/");
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
+
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    
+    if (!email.trim()) errors.email = "Email is required";
+    if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = "Please enter a valid email";
+    if (!password) errors.password = "Password is required";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       setIsLoading(true);
       
@@ -27,8 +56,11 @@ const Login = () => {
       });
 
       if (error) {
+        console.error("Login error:", error);
         throw error;
       }
+
+      console.log("Login successful:", data);
 
       toast({
         title: "Welcome back!",
@@ -39,9 +71,23 @@ const Login = () => {
       navigate("/");
     } catch (error: any) {
       console.error("Error during login:", error);
+      
+      // Provide more specific error messages based on common authentication issues
+      let errorMessage = "Invalid email or password. Please try again.";
+      
+      if (error.message) {
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Invalid email or password. Please try again.";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Please confirm your email before logging in.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Login failed",
-        description: error.message || "Invalid email or password. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -87,8 +133,9 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  className={formErrors.email ? "border-red-500" : ""}
                 />
+                {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -106,8 +153,9 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className={formErrors.password ? "border-red-500" : ""}
                 />
+                {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
