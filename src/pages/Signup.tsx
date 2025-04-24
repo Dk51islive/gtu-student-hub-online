@@ -90,8 +90,9 @@ const Signup = () => {
     try {
       setIsLoading(true);
       
-      // Get the current origin - this will work in both development and production
-      const redirectUrl = window.location.origin + "/login";
+      // Get the current origin for redirect URL
+      // Use current URL's origin for redirect - this will work in all environments including preview, deployed, etc
+      const redirectUrl = `${window.location.origin}/login`;
       console.log("Using redirect URL:", redirectUrl);
       
       // Register user with Supabase

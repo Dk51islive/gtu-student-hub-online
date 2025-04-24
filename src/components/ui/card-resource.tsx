@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { downloadWithWatermark } from "@/utils/watermarkPdf";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 export interface ResourceCardProps {
   id: string;
@@ -34,6 +36,26 @@ const ResourceCard = ({
   downloadUrl,
 }: ResourceCardProps) => {
   const { toast } = useToast();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    
+    checkAuth();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsLoggedIn(!!session);
+      }
+    );
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
   
   const getIcon = () => {
     switch (type) {
@@ -61,9 +83,6 @@ const ResourceCard = ({
   };
   
   const handleDownload = async () => {
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem("user") !== null;
-    
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
@@ -73,18 +92,47 @@ const ResourceCard = ({
       return;
     }
     
-    // Mock user data - in a real application this would come from authentication
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({
+        title: "Authentication Error",
+        description: "Could not verify your credentials. Please log in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .maybeSingle();
+    
     const userData = {
-      enrollmentNo: "GTU12345",
-      phoneNumber: "9876543210",
-      name: "Student Name"
+      enrollmentNo: user.user_metadata?.enrollment_number || "GTU12345",
+      phoneNumber: user.user_metadata?.phone || "9876543210",
+      name: profile?.full_name || user.user_metadata?.full_name || "Student Name"
     };
     
-    // Use the downloadUrl if provided, otherwise construct one based on id
     const url = downloadUrl || `/api/resources/${id}/download`;
     const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${type === 'pdf' ? 'pdf' : type === 'video' ? 'mp4' : 'txt'}`;
     
-    await downloadWithWatermark(url, fileName, userData);
+    try {
+      await downloadWithWatermark(url, fileName, userData);
+      
+      toast({
+        title: "Download Started",
+        description: "Your file is being downloaded with copyright protection.",
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      
+      toast({
+        title: "Download Failed",
+        description: "There was an error downloading your file. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
