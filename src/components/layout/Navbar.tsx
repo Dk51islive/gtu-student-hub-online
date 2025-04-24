@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,18 +12,99 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Bell, Menu, MessageSquare, Search, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userProfile, setUserProfile] = useState<{
+    full_name?: string;
+    avatar_url?: string;
+  } | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in
+    const checkAuthState = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+      
+      if (session?.user) {
+        // Get user profile data
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('id', session.user.id)
+          .single();
+          
+        setUserProfile(data);
+      }
+    };
+    
+    checkAuthState();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setIsLoggedIn(!!session);
+        
+        if (session?.user) {
+          // Get user profile data
+          const { data } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', session.user.id)
+            .maybeSingle();
+            
+          setUserProfile(data);
+        } else {
+          setUserProfile(null);
+        }
+      }
+    );
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // For demonstration purposes only
-  const handleLoginToggle = () => {
-    setIsLoggedIn(!isLoggedIn);
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Logged out successfully",
+        description: "You have been signed out of your account",
+      });
+      
+      navigate('/');
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Logout failed",
+        description: error.message || "Something went wrong",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   };
 
   return (
@@ -32,7 +114,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <span className="text-gtu-blue font-bold text-xl">GTU</span>
-              <span className="text-gtu-orange font-bold text-xl">insta</span>
+              <span className="text-gtu-orange font-bold text-xl">Hub</span>
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-6">
               <Link to="/" className="px-3 py-2 text-gtu-gray-600 hover:text-gtu-blue font-medium">
@@ -68,8 +150,8 @@ const Navbar = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger className="focus:outline-none">
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarImage src={userProfile?.avatar_url || ""} />
+                      <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -85,7 +167,7 @@ const Navbar = () => {
                       <Link to="/settings" className="w-full">Settings</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLoginToggle}>Logout</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
@@ -135,12 +217,12 @@ const Navbar = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>JD</AvatarFallback>
+                      <AvatarImage src={userProfile?.avatar_url || ""} />
+                      <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
                     </Avatar>
-                    <span className="text-gtu-gray-700 font-medium">John Doe</span>
+                    <span className="text-gtu-gray-700 font-medium">{userProfile?.full_name || "User"}</span>
                   </div>
-                  <Button variant="outline" onClick={handleLoginToggle}>
+                  <Button variant="outline" onClick={handleLogout}>
                     Logout
                   </Button>
                 </div>
