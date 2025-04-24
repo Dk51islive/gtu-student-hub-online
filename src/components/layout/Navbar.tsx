@@ -20,7 +20,6 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState<{
     full_name?: string;
-    avatar_url?: string;
   } | null>(null);
   const navigate = useNavigate();
 
@@ -31,10 +30,10 @@ const Navbar = () => {
       setIsLoggedIn(!!session);
       
       if (session?.user) {
-        // Get user profile data
+        // Get user profile data - only query for full_name since avatar_url doesn't exist
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, avatar_url')
+          .select('full_name')
           .eq('id', session.user.id)
           .single();
           
@@ -50,10 +49,10 @@ const Navbar = () => {
         setIsLoggedIn(!!session);
         
         if (session?.user) {
-          // Get user profile data
+          // Get user profile data - only query for full_name since avatar_url doesn't exist
           const { data } = await supabase
             .from('profiles')
-            .select('full_name, avatar_url')
+            .select('full_name')
             .eq('id', session.user.id)
             .maybeSingle();
             
@@ -150,7 +149,6 @@ const Navbar = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger className="focus:outline-none">
                     <Avatar>
-                      <AvatarImage src={userProfile?.avatar_url || ""} />
                       <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
@@ -217,7 +215,6 @@ const Navbar = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <Avatar>
-                      <AvatarImage src={userProfile?.avatar_url || ""} />
                       <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
                     </Avatar>
                     <span className="text-gtu-gray-700 font-medium">{userProfile?.full_name || "User"}</span>
