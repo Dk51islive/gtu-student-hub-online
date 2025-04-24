@@ -9,90 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      gtu_cache: {
-        Row: {
-          created_at: string | null
-          id: string
-          query: string
-          response: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          query: string
-          response: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          query?: string
-          response?: string
-        }
-        Relationships: []
-      }
-      gtu_updates: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          title: string
-          update_type: Database["public"]["Enums"]["update_type"]
-          updated_at: string | null
-          url: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id?: string
-          title: string
-          update_type: Database["public"]["Enums"]["update_type"]
-          updated_at?: string | null
-          url?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          title?: string
-          update_type?: Database["public"]["Enums"]["update_type"]
-          updated_at?: string | null
-          url?: string | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          bio: string | null
-          branch: string | null
-          created_at: string
-          full_name: string | null
-          id: string
-          semester: number | null
-          university_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          bio?: string | null
-          branch?: string | null
-          created_at?: string
-          full_name?: string | null
-          id: string
-          semester?: number | null
-          university_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          bio?: string | null
-          branch?: string | null
-          created_at?: string
-          full_name?: string | null
-          id?: string
-          semester?: number | null
-          university_id?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
@@ -101,7 +18,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      update_type: "result" | "circular" | "notice" | "exam_schedule" | "other"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -216,8 +133,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      update_type: ["result", "circular", "notice", "exam_schedule", "other"],
-    },
+    Enums: {},
   },
 } as const
