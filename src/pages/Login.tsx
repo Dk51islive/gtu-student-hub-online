@@ -83,6 +83,47 @@ const Login = () => {
             errorMessage = "Invalid email or password. Please try again.";
           } else if (error.message.includes("Email not confirmed")) {
             errorMessage = "Please confirm your email before logging in.";
+            
+            // Offer to resend confirmation email
+            toast({
+              title: "Email not verified",
+              description: (
+                <div className="space-y-2">
+                  <p>Please verify your email before logging in.</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={async () => {
+                      try {
+                        const redirectUrl = window.location.origin + "/login";
+                        const { error } = await supabase.auth.resend({
+                          type: 'signup',
+                          email,
+                          options: {
+                            emailRedirectTo: redirectUrl,
+                          }
+                        });
+                        
+                        if (error) throw error;
+                        
+                        toast({
+                          title: "Verification email sent",
+                          description: "Please check your inbox to verify your email"
+                        });
+                      } catch (err: any) {
+                        toast({
+                          title: "Failed to send email",
+                          description: err.message,
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    Resend verification email
+                  </Button>
+                </div>
+              ),
+            });
           } else {
             errorMessage = error.message;
           }

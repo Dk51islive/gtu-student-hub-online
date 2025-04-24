@@ -90,6 +90,10 @@ const Signup = () => {
     try {
       setIsLoading(true);
       
+      // Get the current origin - this will work in both development and production
+      const redirectUrl = window.location.origin + "/login";
+      console.log("Using redirect URL:", redirectUrl);
+      
       // Register user with Supabase
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -101,7 +105,7 @@ const Signup = () => {
             enrollment_number: enrollmentNumber,
             year_of_study: yearOfStudy,
           },
-          emailRedirectTo: window.location.origin + "/login"
+          emailRedirectTo: redirectUrl
         }
       });
 
