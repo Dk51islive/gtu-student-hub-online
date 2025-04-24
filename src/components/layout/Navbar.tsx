@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,14 +29,19 @@ const Navbar = () => {
       setIsLoggedIn(!!session);
       
       if (session?.user) {
-        // Get user profile data - only query for full_name since avatar_url doesn't exist
-        const { data } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', session.user.id)
-          .single();
-          
-        setUserProfile(data);
+        try {
+          // Get user profile data
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (error) throw error;
+          setUserProfile(data);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
       }
     };
     
@@ -49,14 +53,20 @@ const Navbar = () => {
         setIsLoggedIn(!!session);
         
         if (session?.user) {
-          // Get user profile data - only query for full_name since avatar_url doesn't exist
-          const { data } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', session.user.id)
-            .maybeSingle();
-            
-          setUserProfile(data);
+          try {
+            // Get user profile data
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', session.user.id)
+              .maybeSingle();
+              
+            if (error) throw error;
+            setUserProfile(data);
+          } catch (error) {
+            console.error("Error fetching profile:", error);
+            setUserProfile(null);
+          }
         } else {
           setUserProfile(null);
         }
