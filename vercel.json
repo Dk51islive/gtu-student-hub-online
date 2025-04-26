@@ -1,0 +1,10 @@
+{
+    "redirects": [
+      {
+        "source": "https://gtuinsta.club/(.*)",
+        "destination": "https://www.gtuinsta.club/$1",
+        "permanent": true
+      }
+    ]
+  }
+  
