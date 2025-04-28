@@ -92,7 +92,7 @@ const Signup = () => {
       
       // Get the current origin for redirect URL
       // Use current URL's origin for redirect - this will work in all environments including preview, deployed, etc
-      const redirectUrl = `${window.location.origin}/login`;
+      const redirectUrl = `${window.location.origin}/Login`;
       console.log("Using redirect URL:", redirectUrl);
       
       // Register user with Supabase
@@ -132,7 +132,7 @@ const Signup = () => {
       
       if (error.message) {
         if (error.message.includes("User already registered")) {
-          errorMessage = "This email is already registered. Please use another email or try to login.";
+          errorMessage = "This email is already registered. Please use another email or try to Login.";
         } else {
           errorMessage = error.message;
         }
@@ -185,7 +185,7 @@ const Signup = () => {
                       type: 'signup',
                       email: email,
                       options: {
-                        emailRedirectTo: window.location.origin + "/login"
+                        emailRedirectTo: window.location.origin + "/Login"
                       }
                     })
                     .then(() => {
@@ -213,10 +213,10 @@ const Signup = () => {
             </CardContent>
             <CardFooter className="flex justify-center border-t pt-6">
               <Link
-                to="/login"
+                to="/Login"
                 className="text-sm font-medium text-gtu-blue hover:text-gtu-blue/80"
               >
-                Back to login
+                Back to Login
               </Link>
             </CardFooter>
           </Card>
@@ -239,7 +239,7 @@ const Signup = () => {
           <p className="mt-2 text-sm text-gray-600">
             Or{" "}
             <Link
-              to="/login"
+              to="/Login"
               className="font-medium text-gtu-blue hover:text-gtu-blue/80"
             >
               sign in to existing account
@@ -410,7 +410,7 @@ const Signup = () => {
             <div className="text-sm text-center text-gray-500">
               Already have an account?{" "}
               <Link
-                to="/login"
+                to="/Login"
                 className="font-medium text-gtu-blue hover:text-gtu-blue/80"
               >
                 Sign in
