@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -91,7 +90,6 @@ const Signup = () => {
       setIsLoading(true);
       
       // Get the current origin for redirect URL
-      // Use current URL's origin for redirect - this will work in all environments including preview, deployed, etc
       const redirectUrl = `${window.location.origin}/Login`;
       console.log("Using redirect URL:", redirectUrl);
       
@@ -117,6 +115,25 @@ const Signup = () => {
 
       console.log("Signup successful:", data);
       
+      // Insert additional profile data into the profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            id: data.user.id, // Use the user's ID from the signup response
+            full_name: name,
+            department,
+            enrollment_number: enrollmentNumber,
+            year_of_study: yearOfStudy,
+            created_at: new Date().toISOString(), // Optional: Add created_at timestamp
+          }
+        ]);
+
+      if (profileError) {
+        console.error("Profile insert error:", profileError);
+        throw profileError;
+      }
+
       // Show success message instead of redirecting
       setIsSuccess(true);
       toast({
@@ -131,7 +148,7 @@ const Signup = () => {
       let errorMessage = "Something went wrong. Please try again.";
       
       if (error.message) {
-        if (error.message.includes("User already registered")) {
+        if (error.message.includes("User  already registered")) {
           errorMessage = "This email is already registered. Please use another email or try to Login.";
         } else {
           errorMessage = error.message;
@@ -179,31 +196,31 @@ const Signup = () => {
                 </p>
                 <Button 
                   variant="link" 
-                  onClick={() => {
+                  onClick={async () => {
                     setIsLoading(true);
-                    supabase.auth.resend({
-                      type: 'signup',
-                      email: email,
-                      options: {
-                        emailRedirectTo: window.location.origin + "/Login"
-                      }
-                    })
-                    .then(() => {
+                    try {
+                      const { error } = await supabase.auth.resend({
+                        type: 'signup',
+                        email: email,
+                        options: {
+                          emailRedirectTo: window.location.origin + "/Login"
+                        }
+                      });
+                      if (error) throw error;
+
                       toast({
                         title: "Verification email resent",
                         description: "Please check your inbox",
                       });
-                    })
-                    .catch((error) => {
+                    } catch (error) {
                       toast({
                         title: "Failed to resend email",
                         description: error.message,
                         variant: "destructive"
                       });
-                    })
-                    .finally(() => {
+                    } finally {
                       setIsLoading(false);
-                    });
+                    }
                   }}
                   disabled={isLoading}
                 >

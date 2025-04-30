@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,9 +17,7 @@ import { toast } from "@/hooks/use-toast";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userProfile, setUserProfile] = useState<{
-    full_name?: string;
-  } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ full_name?: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -83,10 +81,24 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
+    console.log("Attempting to log out...");
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      console.log("No active session found.");
+      toast({
+        title: "Logout failed",
+        description: "You are not logged in.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signOut();
       
       if (error) {
+        console.error("Logout error:", error);
         throw error;
       }
       
@@ -227,7 +239,7 @@ const Navbar = () => {
                     <Avatar>
                       <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
                     </Avatar>
-                    <span className="text-gtu-gray-700 font-medium">{userProfile?.full_name || "User"}</span>
+                    <span className="text-gtu-gray-700 font-medium">{userProfile?.full_name || "User "}</span>
                   </div>
                   <Button variant="outline" onClick={handleLogout}>
                     Logout

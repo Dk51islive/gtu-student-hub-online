@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -75,7 +74,6 @@ const Login = () => {
       if (error) {
         console.error("Login error:", error);
         
-        // Provide more specific error messages based on common authentication issues
         let errorMessage = "Invalid email or password. Please try again.";
         
         if (error.message) {
@@ -83,8 +81,6 @@ const Login = () => {
             errorMessage = "Invalid email or password. Please try again.";
           } else if (error.message.includes("Email not confirmed")) {
             errorMessage = "Please confirm your email before logging in.";
-            
-            // Offer to resend confirmation email
             toast({
               title: "Email not verified",
               description: (
@@ -138,7 +134,6 @@ const Login = () => {
         return;
       }
 
-      // Note: We don't need to navigate here as the onAuthStateChange handles this
       console.log("Login successful:", data);
       
     } catch (error: any) {
