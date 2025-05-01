@@ -5,6 +5,7 @@ import { AnimatedGradient } from "@/components/ui/animated-gradient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Search } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
 import { 
   Select, 
   SelectContent, 

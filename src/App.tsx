@@ -4,12 +4,16 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
+import { ResourceProvider } from "@/context/ResourceContext";
 import { StrictMode, useEffect } from "react";
 import Index from "./pages/Index";
 import Resources from "./pages/Resources";
+import Profile from "./pages/profile";
 import Events from "./pages/Events";
 import Community from "./pages/Community";
 import Forum from "./pages/Forum";
+import Home from "./pages/Home";
 import ForumNew from "./pages/ForumNew";
 import ForumPostView from "./pages/ForumPostView";
 import Login from "./pages/Login";
@@ -46,6 +50,7 @@ const App = () => {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -55,6 +60,8 @@ const App = () => {
               {/* Main content routes */}
               <Route path="/" element={<Index />} />
               <Route path="/resources" element={<Resources />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/resources/:id" element={<ViewResource />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/:id/register" element={<RegisterEvent />} />
@@ -82,6 +89,7 @@ const App = () => {
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </StrictMode>
   );
