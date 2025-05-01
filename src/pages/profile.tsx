@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Navigate, useNavigate } from "react-router-dom";
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Profile {
   id: string;
@@ -11,7 +11,7 @@ interface Profile {
   year_of_study: string;
 }
 
-export default function ProfilePage() {
+export default function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -29,13 +29,13 @@ export default function ProfilePage() {
       }
 
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle(); // ✅ Safely return null if none or many
 
       if (error) {
-        console.error('Error loading profile:', error.message);
+        console.error("Error loading profile:", error.message);
       } else {
         setProfile(data);
       }
@@ -56,7 +56,7 @@ export default function ProfilePage() {
       <div><strong>Email:</strong> {profile.email}</div>
       <div><strong>Enrollment Number:</strong> {profile.enrollment_number}</div>
       <div><strong>Department:</strong> {profile.department}</div>
-      <div><strong>Year Of Study:</strong> {profile.year_of_study}</div>
+      <div><strong>Year Of Study:</strong> {profile.year_of_study || "Not set"}</div>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 // src/context/AuthContext.tsx
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +22,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const initSession = async () => {
+    handleInitialSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const sessionUser = session?.user || null;
+      setUser(sessionUser);
+      setSession(session);
+      setIsAuthenticated(!!sessionUser);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleInitialSession = async () => {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
+
+    if (code) {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        toast({
+          title: "Session Exchange Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const sessionUser = data.user;
+      setUser(sessionUser);
+      setSession(data.session);
+      setIsAuthenticated(true);
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
         toast({
@@ -38,21 +73,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(sessionUser);
       setSession(data.session);
       setIsAuthenticated(!!sessionUser);
-    };
-
-    initSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const sessionUser = session?.user || null;
-      setUser(sessionUser);
-      setSession(session);
-      setIsAuthenticated(!!sessionUser);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [toast]);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -73,7 +95,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(sessionUser);
     setIsAuthenticated(true);
 
-    // Check if profile exists
     const { data: existingProfile, error: profileError } = await supabase
       .from("profiles")
       .select("*")

@@ -24,10 +24,10 @@ const Navbar = () => {
     const fetchProfile = async () => {
       if (!user?.id) return;
       const { data, error } = await supabase
-        .from("profiles")
-        .select("full_name")
-        .eq("id", user.id)
-        .single();
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .maybeSingle(); // ✅ Returns null if not found, no error
 
       if (error) {
         console.error("Error fetching user profile:", error.message);
