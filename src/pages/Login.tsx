@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,6 +16,36 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ Handle email verification link (hash-based access_token)
+  useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.slice(1));
+    const access_token = hash.get("access_token");
+    const refresh_token = hash.get("refresh_token");
+
+    if (access_token && refresh_token) {
+      supabase.auth
+        .setSession({ access_token, refresh_token })
+        .then(({ error }) => {
+          if (error) {
+            toast({
+              title: "Verification Failed",
+              description: error.message,
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Email Verified",
+              description: "Your email has been successfully verified.",
+            });
+            navigate("/", { replace: true });
+          }
+        });
+
+      // Remove the fragment from the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -53,7 +84,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-      {/* GTUHub Branding */}
       <div className="text-4xl font-bold mb-2 text-center">
         <span className="text-blue-600">GTU</span>
         <span className="text-orange-500">Hub</span>
@@ -86,9 +116,7 @@ const Login = () => {
                   disabled={isLoading}
                   className={formErrors.email ? "border-red-500" : ""}
                 />
-                {formErrors.email && (
-                  <p className="text-sm text-red-500">{formErrors.email}</p>
-                )}
+                {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
               </div>
 
               <div>
@@ -107,24 +135,19 @@ const Login = () => {
                   disabled={isLoading}
                   className={formErrors.password ? "border-red-500" : ""}
                 />
-                {formErrors.password && (
-                  <p className="text-sm text-red-500">{formErrors.password}</p>
-                )}
+                {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
               </div>
-              <div className="flex items-center space-x-2 mb-4">
-  <input type="checkbox" id="remember" className="h-4 w-4" />
-  <label htmlFor="remember" className="text-sm text-gray-700">
-    Remember me
-  </label>
-</div>
 
+              <div className="flex items-center space-x-2 mb-4">
+                <input type="checkbox" id="remember" className="h-4 w-4" />
+                <label htmlFor="remember" className="text-sm text-gray-700">Remember me</label>
+              </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
           </CardContent>
-
           <CardFooter className="text-sm text-center justify-center">
             <span>Don't have an account?</span>
             <Link to="/signup" className="ml-1 text-blue-600 font-medium hover:underline">
