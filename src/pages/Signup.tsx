@@ -26,8 +26,6 @@ import { Info } from "lucide-react";
 
 const Signup = () => {
   const navigate = useNavigate();
-
-  // ✅ All hooks must be here
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,16 +64,12 @@ const Signup = () => {
     if (!email.trim()) errors.email = "Email is required";
     if (!/^\S+@\S+\.\S+$/.test(email)) errors.email = "Enter a valid email";
     if (!password) errors.password = "Password is required";
-    if (password.length < 6)
-      errors.password = "Password must be at least 6 characters";
-    if (password !== confirmPassword)
-      errors.confirmPassword = "Passwords do not match";
+    if (password.length < 6) errors.password = "At least 6 characters required";
+    if (password !== confirmPassword) errors.confirmPassword = "Passwords do not match";
     if (!department) errors.department = "Department is required";
-    if (!enrollmentNumber.trim())
-      errors.enrollmentNumber = "Enrollment number is required";
+    if (!enrollmentNumber.trim()) errors.enrollmentNumber = "Enrollment number is required";
     if (!yearOfStudy) errors.yearOfStudy = "Year of study is required";
     if (!termsAccepted) errors.terms = "You must accept the terms";
-
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -85,7 +79,7 @@ const Signup = () => {
     if (!validateForm()) {
       toast({
         title: "Validation failed",
-        description: "Please correct the errors in the form.",
+        description: "Please fix the errors and try again.",
         variant: "destructive",
       });
       return;
@@ -95,7 +89,7 @@ const Signup = () => {
       setIsLoading(true);
       const redirectUrl = `${window.location.origin}/login`;
 
-      const { error: signupError } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -109,17 +103,17 @@ const Signup = () => {
         },
       });
 
-      if (signupError) throw signupError;
+      if (error) throw error;
 
       setIsSuccess(true);
       toast({
         title: "Signup successful",
-        description: "Check your email to verify your account",
+        description: "Check your inbox to verify your email.",
       });
-    } catch (error: any) {
+    } catch (err: any) {
       toast({
         title: "Signup failed",
-        description: error.message || "Something went wrong",
+        description: err.message || "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -127,7 +121,7 @@ const Signup = () => {
     }
   };
 
-  const handleResendEmail = async () => {
+  const handleResend = async () => {
     try {
       setIsResending(true);
       const { error } = await supabase.auth.resend({
@@ -135,15 +129,14 @@ const Signup = () => {
         email,
       });
       if (error) throw error;
-
       toast({
         title: "Verification email resent",
         description: "Please check your inbox again.",
       });
-    } catch (error: any) {
+    } catch (err: any) {
       toast({
         title: "Resend failed",
-        description: error.message || "Something went wrong",
+        description: err.message,
         variant: "destructive",
       });
     } finally {
@@ -165,15 +158,10 @@ const Signup = () => {
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Please check your inbox and verify your email to log in.
-                It may take a minute or appear in your spam folder.
+                Please check your inbox. It may take a minute or land in spam.
               </AlertDescription>
             </Alert>
-            <Button
-              variant="outline"
-              onClick={handleResendEmail}
-              disabled={isResending}
-            >
+            <Button variant="outline" onClick={handleResend} disabled={isResending}>
               {isResending ? "Resending..." : "Resend Email"}
             </Button>
           </CardContent>
@@ -197,7 +185,7 @@ const Signup = () => {
       <p className="text-sm text-muted-foreground mt-1">
         Or{" "}
         <Link to="/login" className="text-blue-600 hover:underline">
-          sign in to existing account
+          sign in to an existing account
         </Link>
       </p>
 
@@ -212,21 +200,13 @@ const Signup = () => {
           <CardContent className="space-y-4">
             <div>
               <Label>Full Name</Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-              />
+              <Input value={name} onChange={(e) => setName(e.target.value)} />
               {formErrors.name && <p className="text-sm text-red-500">{formErrors.name}</p>}
             </div>
 
             <div>
               <Label>Email</Label>
-              <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-              />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} />
               {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
             </div>
 
@@ -236,7 +216,6 @@ const Signup = () => {
                 <Input
                   value={enrollmentNumber}
                   onChange={(e) => setEnrollmentNumber(e.target.value)}
-                  placeholder="Enter enrollment no."
                 />
                 {formErrors.enrollmentNumber && (
                   <p className="text-sm text-red-500">{formErrors.enrollmentNumber}</p>
@@ -287,9 +266,10 @@ const Signup = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password"
               />
-              {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
+              {formErrors.password && (
+                <p className="text-sm text-red-500">{formErrors.password}</p>
+              )}
             </div>
 
             <div>
@@ -298,7 +278,6 @@ const Signup = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
               />
               {formErrors.confirmPassword && (
                 <p className="text-sm text-red-500">{formErrors.confirmPassword}</p>
@@ -327,15 +306,6 @@ const Signup = () => {
             <Button className="w-full" type="submit" disabled={isLoading}>
               {isLoading ? "Creating..." : "Create Account"}
             </Button>
-            <p className="text-sm text-center">
-              Already have an account?{" "}
-              <Link to="/login" className="text-blue-600 hover:underline">
-                Sign in
-              </Link>
-            </p>
-            <Link to="/" className="text-sm text-gray-500 hover:underline text-center">
-              ← Back to Home
-            </Link>
           </CardFooter>
         </form>
       </Card>

@@ -16,6 +16,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   // ✅ Handle email verification link (hash-based access_token)
   useEffect(() => {
@@ -24,6 +25,7 @@ const Login = () => {
     const refresh_token = hash.get("refresh_token");
 
     if (access_token && refresh_token) {
+      setVerifying(true);
       supabase.auth
         .setSession({ access_token, refresh_token })
         .then(({ error }) => {
@@ -40,10 +42,11 @@ const Login = () => {
             });
             navigate("/", { replace: true });
           }
+        })
+        .finally(() => {
+          setVerifying(false);
+          window.history.replaceState({}, document.title, window.location.pathname);
         });
-
-      // Remove the fragment from the URL
-      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
@@ -89,7 +92,9 @@ const Login = () => {
         <span className="text-orange-500">Hub</span>
       </div>
 
-      <h2 className="text-2xl font-semibold text-center text-black">Sign in to your account</h2>
+      <h2 className="text-2xl font-semibold text-center text-black">
+        {verifying ? "Verifying email..." : "Sign in to your account"}
+      </h2>
       <p className="text-center text-sm text-gray-600 mb-6">
         Or{" "}
         <Link to="/signup" className="text-blue-600 font-medium hover:underline">
@@ -113,7 +118,7 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
+                  disabled={isLoading || verifying}
                   className={formErrors.email ? "border-red-500" : ""}
                 />
                 {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
@@ -132,7 +137,7 @@ const Login = () => {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
+                  disabled={isLoading || verifying}
                   className={formErrors.password ? "border-red-500" : ""}
                 />
                 {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
@@ -143,8 +148,8 @@ const Login = () => {
                 <label htmlFor="remember" className="text-sm text-gray-700">Remember me</label>
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
+              <Button type="submit" className="w-full" disabled={isLoading || verifying}>
+                {isLoading ? "Signing in..." : verifying ? "Verifying..." : "Sign in"}
               </Button>
             </form>
           </CardContent>
