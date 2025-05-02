@@ -38,11 +38,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleInitialSession = async () => {
     const url = new URL(window.location.href);
+  
+    // ✅ 1. Handle email confirmation links with #access_token
+    if (window.location.hash.includes("access_token")) {
+      const hash = new URLSearchParams(window.location.hash.slice(1));
+      const access_token = hash.get("access_token");
+      const refresh_token = hash.get("refresh_token");
+  
+      if (access_token && refresh_token) {
+        const { data, error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+  
+        if (error) {
+          toast({
+            title: "Session Restore Failed",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
+  
+        const sessionUser = data.session?.user ?? null;
+        setUser(sessionUser);
+        setSession(data.session);
+        setIsAuthenticated(!!sessionUser);
+  
+        // Remove tokens from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+    }
+  
+    // ✅ 2. Handle OAuth/magic link redirect with ?code=...
     const code = url.searchParams.get("code");
-
     if (code) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
+  
       if (error) {
         toast({
           title: "Session Exchange Failed",
@@ -51,29 +84,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
         return;
       }
-
+  
       const sessionUser = data.user;
       setUser(sessionUser);
       setSession(data.session);
       setIsAuthenticated(true);
-
       window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        toast({
-          title: "Session Error",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const sessionUser = data.session?.user || null;
-      setUser(sessionUser);
-      setSession(data.session);
-      setIsAuthenticated(!!sessionUser);
+      return;
     }
+  
+    // ✅ 3. Normal page load
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      toast({
+        title: "Session Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+  
+    const sessionUser = data.session?.user || null;
+    setUser(sessionUser);
+    setSession(data.session);
+    setIsAuthenticated(!!sessionUser);
   };
 
   const login = async (email: string, password: string) => {

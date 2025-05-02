@@ -26,6 +26,8 @@ import { Info } from "lucide-react";
 
 const Signup = () => {
   const navigate = useNavigate();
+
+  // ✅ All hooks must be here
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,6 +38,7 @@ const Signup = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -76,6 +79,7 @@ const Signup = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -86,12 +90,12 @@ const Signup = () => {
       });
       return;
     }
-  
+
     try {
       setIsLoading(true);
-  
       const redirectUrl = `${window.location.origin}/login`;
-      const { data: signupData, error: signupError } = await supabase.auth.signUp({
+
+      const { error: signupError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -104,25 +108,9 @@ const Signup = () => {
           },
         },
       });
-  
+
       if (signupError) throw signupError;
-  
-      // ✅ Get user id from response
-      const userId = signupData.user?.id;
-      if (!userId) throw new Error("User ID not returned from signup");
-  
-      // ✅ Insert additional profile data
-      const { error: insertError } = await supabase.from("profiles").insert({
-        id: userId, // assuming "id" is the primary key that matches auth.users
-        full_name: name,
-        email,
-        department,
-        enrollment_number: enrollmentNumber,
-        year_of_study: yearOfStudy,
-      });
-  
-      if (insertError) throw insertError;
-  
+
       setIsSuccess(true);
       toast({
         title: "Signup successful",
@@ -138,7 +126,31 @@ const Signup = () => {
       setIsLoading(false);
     }
   };
-  
+
+  const handleResendEmail = async () => {
+    try {
+      setIsResending(true);
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+      });
+      if (error) throw error;
+
+      toast({
+        title: "Verification email resent",
+        description: "Please check your inbox again.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Resend failed",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
@@ -149,13 +161,21 @@ const Signup = () => {
               We’ve sent a verification email to <strong>{email}</strong>
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
                 Please check your inbox and verify your email to log in.
+                It may take a minute or appear in your spam folder.
               </AlertDescription>
             </Alert>
+            <Button
+              variant="outline"
+              onClick={handleResendEmail}
+              disabled={isResending}
+            >
+              {isResending ? "Resending..." : "Resend Email"}
+            </Button>
           </CardContent>
           <CardFooter className="justify-center border-t pt-4">
             <Link to="/login" className="text-sm text-blue-600 hover:underline">
@@ -192,21 +212,35 @@ const Signup = () => {
           <CardContent className="space-y-4">
             <div>
               <Label>Full Name</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your full name" />
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
+              />
               {formErrors.name && <p className="text-sm text-red-500">{formErrors.name}</p>}
             </div>
 
             <div>
               <Label>Email</Label>
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" />
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+              />
               {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
             </div>
 
             <div className="flex gap-4">
               <div className="flex-1">
                 <Label>Enrollment Number</Label>
-                <Input value={enrollmentNumber} onChange={(e) => setEnrollmentNumber(e.target.value)} placeholder="Enter enrollment no." />
-                {formErrors.enrollmentNumber && <p className="text-sm text-red-500">{formErrors.enrollmentNumber}</p>}
+                <Input
+                  value={enrollmentNumber}
+                  onChange={(e) => setEnrollmentNumber(e.target.value)}
+                  placeholder="Enter enrollment no."
+                />
+                {formErrors.enrollmentNumber && (
+                  <p className="text-sm text-red-500">{formErrors.enrollmentNumber}</p>
+                )}
               </div>
               <div className="flex-1">
                 <Label>Year of Study</Label>
@@ -222,7 +256,9 @@ const Signup = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                {formErrors.yearOfStudy && <p className="text-sm text-red-500">{formErrors.yearOfStudy}</p>}
+                {formErrors.yearOfStudy && (
+                  <p className="text-sm text-red-500">{formErrors.yearOfStudy}</p>
+                )}
               </div>
             </div>
 
@@ -240,27 +276,49 @@ const Signup = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {formErrors.department && <p className="text-sm text-red-500">{formErrors.department}</p>}
+              {formErrors.department && (
+                <p className="text-sm text-red-500">{formErrors.department}</p>
+              )}
             </div>
 
             <div>
               <Label>Password</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" />
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password"
+              />
               {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
             </div>
 
             <div>
               <Label>Confirm Password</Label>
-              <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm your password" />
-              {formErrors.confirmPassword && <p className="text-sm text-red-500">{formErrors.confirmPassword}</p>}
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+              />
+              {formErrors.confirmPassword && (
+                <p className="text-sm text-red-500">{formErrors.confirmPassword}</p>
+              )}
             </div>
 
             <div className="flex items-start gap-2">
-              <Checkbox checked={termsAccepted} onCheckedChange={(val) => setTermsAccepted(!!val)} />
+              <Checkbox
+                checked={termsAccepted}
+                onCheckedChange={(val) => setTermsAccepted(!!val)}
+              />
               <p className="text-sm">
                 I agree to the{" "}
-                <a href="#" className="text-blue-600 hover:underline">terms of service</a> and{" "}
-                <a href="#" className="text-blue-600 hover:underline">privacy policy</a>
+                <a href="#" className="text-blue-600 hover:underline">
+                  terms of service
+                </a>{" "}
+                and{" "}
+                <a href="#" className="text-blue-600 hover:underline">
+                  privacy policy
+                </a>
               </p>
             </div>
             {formErrors.terms && <p className="text-sm text-red-500">{formErrors.terms}</p>}
@@ -271,7 +329,9 @@ const Signup = () => {
             </Button>
             <p className="text-sm text-center">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-600 hover:underline">Sign in</Link>
+              <Link to="/login" className="text-blue-600 hover:underline">
+                Sign in
+              </Link>
             </p>
             <Link to="/" className="text-sm text-gray-500 hover:underline text-center">
               ← Back to Home
