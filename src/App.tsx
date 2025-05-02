@@ -58,10 +58,10 @@ const App = () => {
             <ScrollToTop />
             <Routes>
               {/* Main content routes */}
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Index />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="/profile" element={<Profile />} />
-              {/* <Route path="/home" element={<Home />} /> */}
+              <Route path="/home" element={<Home />} />
               <Route path="/resources/:id" element={<ViewResource />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/:id/register" element={<RegisterEvent />} />
