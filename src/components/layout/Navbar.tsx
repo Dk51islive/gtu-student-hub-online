@@ -135,16 +135,50 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 border-t">
-              {user ? (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-gtu-gray-700 font-medium">{userProfile?.full_name || "User"}</span>
-                  </div>
-                  <Button variant="outline" onClick={handleLogout}>Logout</Button>
-                </div>
+            {user ? (
+  <div className="space-y-4">
+    {/* User Info */}
+    <div className="flex items-center space-x-3">
+      <Avatar>
+        <AvatarFallback>{getInitials(userProfile?.full_name)}</AvatarFallback>
+      </Avatar>
+      <div>
+        <span className="text-gtu-gray-700 font-medium block">{userProfile?.full_name || "User"}</span>
+        <span className="text-xs text-gtu-gray-500">GTU Member</span>
+      </div>
+    </div>
+
+    {/* My Profile Button */}
+    <Link
+  to="/profile"
+  className="flex items-center justify-start gap-2 px-4 py-2 rounded-md bg-blue-100 text-blue-800 hover:bg-orange-100 hover:text-orange-800 shadow-sm transition text-sm font-medium"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-4 w-4"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.797.657 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+    />
+  </svg>
+  My Profile
+</Link>
+
+    {/* Logout Button */}
+    <Button
+      variant="outline"
+      onClick={handleLogout}
+      className="w-full text-sm font-medium"
+    >
+      Logout
+    </Button>
+  </div>
               ) : (
                 <div className="flex flex-col space-y-2">
                   <Button variant="outline" asChild className="w-full"><Link to="/login">Login</Link></Button>

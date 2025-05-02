@@ -68,12 +68,12 @@ export default function Profile() {
     );
 
   return (
-    <div className="flex justify-center mt-12 px-4">
-      {/* Left-side Back Button */}
-      <div className="mr-6 flex-shrink-0">
+    <div className="max-w-xl mx-auto mt-12 px-4">
+      {/* Back Button beside card */}
+      <div className="mb-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium shadow hover:bg-orange-500 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium shadow hover:bg-orange-500 transition"
         >
           <ArrowLeftIcon className="w-4 h-4" />
           Back
@@ -81,7 +81,7 @@ export default function Profile() {
       </div>
 
       {/* Profile Card */}
-      <div className="w-full max-w-xl bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-orange-500 p-6 text-white flex items-center space-x-4">
           <UserCircleIcon className="h-16 w-16 text-white" />
