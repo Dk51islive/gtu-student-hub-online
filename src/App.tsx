@@ -9,7 +9,7 @@ import { ResourceProvider } from "@/context/ResourceContext";
 import { StrictMode, useEffect } from "react";
 import Index from "./pages/Index";
 import Resources from "./pages/Resources";
-import Profile from "./pages/profile";
+import Profile from "./pages/Profile";
 import Events from "./pages/Events";
 import Community from "./pages/Community";
 import Forum from "./pages/Forum";
@@ -58,10 +58,10 @@ const App = () => {
             <ScrollToTop />
             <Routes>
               {/* Main content routes */}
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Home />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/home" element={<Home />} />
+              {/* <Route path="/home" element={<Home />} /> */}
               <Route path="/resources/:id" element={<ViewResource />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/:id/register" element={<RegisterEvent />} />
